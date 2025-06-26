@@ -45,6 +45,7 @@ const Home:NextPage = () => {
 
     const [address, setAddress] = useState("");
     const [amount, setAmount] = useState("");
+    const [warning, setWarning] = useState("");
 
     useEffect(() => {
         if (priceData && priceData.sui) {
@@ -53,7 +54,16 @@ const Home:NextPage = () => {
 
     }, [priceData]);
 
-
+    const isAmountValid = () => {
+        const amt = parseFloat(amount);
+        return (
+            amount !== "" &&
+            !isNaN(amt) &&
+            amt > 0 &&
+            amt <= Number(mistToSuiDecimal(userBalance!))
+        );
+    };
+    const isFormValid = address.trim() !== "" && isAmountValid();
 
     return (
         <Layout>
@@ -117,18 +127,31 @@ const Home:NextPage = () => {
                                     />
                                 </div>
                                 <button
-                                    className="w-full py-2 rounded-xl bg-red-200 text-black font-bold hover:bg-primary-400 transition"
+                                    className="w-full py-2 rounded-xl bg-red-200 text-black font-bold hover:bg-primary-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!isFormValid}
                                     onClick={() => {
-                                            executeTransaction({
-                                              amount: (amount).toString(),
-                                              recipient: address,
-                                            });
+                                        if (!isFormValid) {
+                                            if (address.trim() === "" || amount === "") {
+                                                setWarning("Both address and amount are required.");
+                                            } else if (!isAmountValid()) {
+                                                setWarning("Amount must be greater than 0 and less than or equal to your available Sui.");
+                                            }
+                                            return;
+                                        }
+                                        setWarning("");
+                                        executeTransaction({
+                                            amount: amount.toString(),
+                                            recipient: address,
+                                        });
                                         setFlipped(true);
                                         setPosition("Down");
                                     }}
                                 >
                                     Submit
                                 </button>
+                                {warning && (
+                                    <div className="mt-2 text-red-400 text-sm font-semibold">{warning}</div>
+                                )}
                             </div>
 
                         </div>
