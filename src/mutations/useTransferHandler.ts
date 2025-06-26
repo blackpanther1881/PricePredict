@@ -23,12 +23,13 @@ export const useTransferHandler = (options?: TransactionOptions) => {
 
   const executeTransaction = async ({
     amount,
+    recipient
   }: {
     amount: string;
+    recipient: string
   }) => {
     if (!currentWallet) throw new Error("Wallet not connected");
     try {
-      const recipient = ""
       const amountInSui = amount;
       const amountInMist = suiToMist(amountInSui);
 

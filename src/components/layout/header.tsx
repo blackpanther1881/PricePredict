@@ -33,7 +33,8 @@ export const Header = () => {
 
     useEffect(() => {
         const authenticateHandler = async () => {
-            if (currentAccount?.address) {
+            const sessionStartStr = sessionStorage.getItem("sessionStart");
+            if (currentAccount?.address && !sessionStartStr) {
                 window.sessionStorage.setItem("sessionStart", Date.now().toString());
             }
         }
